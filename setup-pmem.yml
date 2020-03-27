@@ -1,0 +1,39 @@
+- hosts: servers
+  vars:
+    namespaces_to_create:
+      - "namespace0.0"
+      - "namespace1.0"
+    namespaces_to_reconfigure: []
+  tasks:
+    - name: Build a list of all existing namespaces.
+      set_fact:
+        namespaces_to_reconfigure: "{{ namespaces_to_reconfigure }} + [ '{{ item.dev }}' ]"
+      with_items: "{{ ansible_facts.ansible_local.ndctl_facts.nvdimm }}"
+
+    - name: Configure missing namespaces
+      command: ndctl create-namespace -f -n {{ item }} -m fsdax 
+      with_items: "{{ namespaces_to_create | difference(namespaces_to_reconfigure) }}"
+      become: yes
+    - name: Reconfigure namespaces
+      command: ndctl create-namespace -f -e {{ item }} -m fsdax
+      with_items: "{{ namespaces_to_reconfigure | intersect(namespaces_to_create) }}"
+      become: yes
+      
+    - name: Create /mnt/pmem
+      file:
+        path: /mnt/pmem
+      become: yes
+    - name: Create a ext4 filesystem on /dev/pmem0
+      filesystem:
+        fstype: ext4
+        opts: -b 4096 -E stride=512
+        dev: /dev/pmem0
+      become: yes
+    - name: Mount pmem
+      mount:
+        src: /dev/pmem0
+        path: /mnt/pmem
+        fstype: ext4
+        opts: dax
+        state: mounted
+      become: yes
