@@ -1,0 +1,14 @@
+#!/bin/bash
+
+NDCTL_LIST=`ndctl list`
+
+if [ -z "$NDCTL_LIST" ]
+then
+      NDCTL_LIST="[]"
+fi
+
+cat <<EOF
+{
+    "nvdimm": $NDCTL_LIST
+}
+EOF

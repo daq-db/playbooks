@@ -1,0 +1,46 @@
+# after installation it should create custom fact
+# $ ansible all -i inventory -m setup -a "filter=ansible_local"  
+# hostname | SUCCESS => {
+#     "ansible_facts": {
+#         "ansible_local": {
+#             "ndctl_facts": {
+#                 "nvdimm": [
+#                     {
+#                         "blockdev": "pmem1",
+#                         "dev": "namespace1.0",
+#                         "mode": "raw",
+#                         "sector_size": 4096,
+#                         "size": 992137445376,
+#                         "uuid": "cc9b0bc2-c0df-554d-abcc-4ea79f8cb50d"
+#                     },
+#                     {
+#                         "align": 2097152,
+#                         "blockdev": "pmem0",
+#                         "dev": "namespace0.0",
+#                         "map": "dev",
+#                         "mode": "fsdax",
+#                         "sector_size": 4096,
+#                         "size": 976633200640,
+#                         "uuid": "04e90da2-12c6-4c78-a9aa-7e938731b8a5"
+#                     }
+#                 ]
+#             }
+#         },
+#         "discovered_interpreter_python": "/usr/bin/python"
+#     },
+#     "changed": false
+# }
+---
+- hosts: benchmark_nth
+  tasks:
+      - name: ensure custom facts directory exists
+        file:
+            path: /etc/ansible/facts.d
+            recurse: yes
+            state: directory
+          
+      - name: install custom fact module for nvdimm namespaces
+        template: 
+            src: custom_facts/ndctl_facts.fact
+            dest: /etc/ansible/facts.d/ndctl_facts.fact
+            mode: 0755
