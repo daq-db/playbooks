@@ -1,0 +1,32 @@
+- hosts: localhost
+  connection: local
+  become: yes
+  vars:
+    fogkv_path: '/home/fogkv'
+    fogkv_DAQDB_path: '/home/fogkv/daqdb-configuration-master'
+  tasks:
+   -  name: "Run pkgdep.sh"
+     shell: |
+       sudo yum remove -y libibverbs libibumad librdmacm
+       sudo yum -y remove rdma-core-devel
+       cd '{{ fogkv_path }}/daqdb_installation/daqdb'
+       sudo ./scripts/pkgdep.sh
+       grep -ir exclud /etc/yum.*
+       sudo third-party/spdk/scripts/pkgdep.sh
+  -  name: "Remove boost devel to be able to install gtest-devel 1.8"
+     yum:
+       state:  absent
+       name:
+       -  boost-devel
+  -  name: "Install asio-devel, cmake3, gtest-devel"
+     yum:
+       state:  present
+       name:
+       -  http://repo.okay.com.mx/centos/7/x86_64/release/okay-release-1-1.noarch.rpm
+       -  boost166-devel
+       -  asio-devel
+       -  cmake3
+       -  gtest-devel
+
+
+

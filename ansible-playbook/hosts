@@ -1,0 +1,17 @@
+## Hosts to run Ansible script
+
+
+[daq]
+# localhost
+
+
+[intel]
+# epdtdifogkv1
+# epdtdifogkv2
+# epdtdifogkv4
+
+
+[epdtdi]
+# epdtdi103
+# epdtdi104
+

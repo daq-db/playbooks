@@ -1,0 +1,35 @@
+- hosts: localhost
+  connection: local
+  become: yes
+  vars:
+    fogkv_path: '/home/fogkv'
+    fogkv_DAQDB_path: '/home/fogkv/daqdb-configuration-master'
+  tasks:
+##### Setup AFS area from root user.	
+  -  name: "Install openafs-client"
+     shell: yum -y install openafs-client openafs-server openafs-krb5 kmod-openafs
+  -  name: "Download openafs-1.8.0"
+     get_url:
+       url: https://www.openafs.org/dl/openafs/1.8.0/openafs-1.8.0-src.tar.gz
+       dest: '{{ fogkv_path }}/'
+  -  name: Extract openafs-1.8.0"
+     unarchive:
+       src: '{{ fogkv_path }}/openafs-1.8.0-src.tar.gz'
+       dest: '{{ fogkv_path }}/'
+  -  name: "Install openafs-1.8.0."
+     shell: |
+       cd '{{ fogkv_path }}/openafs-1.8.0/'
+       ./configure
+       make -j70
+       make install
+       mkdir /lib/modules/4.15.0/kernel/fs/openafs
+       mkdir /usr/lib/modules/4.15.0/extra
+       mkdir /usr/lib/modules/4.15.0/extra/openafs/
+       cp src/libafs/MODLOAD-4.15.0-MP/libafs-4.15.0.mp.ko /lib/modules/4.15.0/kernel/fs/openafs/openafs.ko
+       cp /usr/lib/modules/4.15.0/kernel/fs/openafs/openafs.ko   /usr/lib/modules/4.15.0/extra/openafs/
+       depmod -a
+       modprobe openafs
+       systemctl enable openafs-client
+       systemctl status openafs-client
+       systemctl start openafs-client
+       systemctl status openafs-client

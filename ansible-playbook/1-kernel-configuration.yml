@@ -1,0 +1,53 @@
+- hosts: localhost
+  connection: local
+  become: yes
+  vars:
+    fogkv_path: '/home/fogkv'
+    fogkv_DAQDB_path: '/home/fogkv/daqdb-configuration-master-DAQDB-installation'
+  tasks:
+ ##### Kernel configuration
+  -  name: Download kernel version 4.15
+     get_url:
+       url: https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.15.tar.xz
+       dest: '{{ fogkv_path }}/'
+  -  name: Extract kernel file
+     unarchive:
+       src: '{{ fogkv_path }}/linux-4.15.tar.xz'
+       dest: '{{ fogkv_path }}/'
+  -  name: Download kernel_config
+     get_url:
+       url: http://aabedabu.web.cern.ch/aabedabu/sites/resources/kernel_config
+       dest: '{{ fogkv_path }}/'
+  -  name: Download kernel_install.sh
+     get_url:
+       url: http://aabedabu.web.cern.ch/aabedabu/sites/resources/kernel_install.sh
+       dest: '{{ fogkv_path }}/'
+  -  name: Copy kernel_config inside linux-4.15 as .config
+     shell: cp '{{ fogkv_path }}/kernel_config' '{{ fogkv_path }}/linux-4.15/.config' 
+  -  name: Copy kernel_install.sh into /home/fogkv/linux-4.15/
+     shell: cp '{{ fogkv_path }}/kernel_install.sh' '{{ fogkv_path }}/linux-4.15/'
+
+  -  name: Set config file
+     shell: |
+       cd '{{ fogkv_path }}/linux-4.15'
+       sudo make oldconfig
+       sudo make -j `nproc` && make modules_install && make install
+  -  name: Install rpm-build
+     yum: 
+       state:  present
+       name: 
+        -  rpm-build
+  -  name: Install the right version of kernel-headers-4.15.0-2.x86_64.rpm
+     shell: make rpm-pkg
+  -  name: Install the right version of kernel-headers-4.15.0-2.x86_64.rpm
+     shell: rpm -iUv ~/rpmbuild/RPMS/x86_64/kernel-headers-4.15.0-1.x86_64.rpm
+
+ ##### Fix the grub
+  - name: Make newly installed kernel the default. Fix the grub.
+    shell: |
+       grub2-set-default "CentOS Linux (4.15.0) 7 (Core)"
+       grub2-mkconfig -o /etc/grub2-efi.cfg
+       reboot  
+
+
+ 

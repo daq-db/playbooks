@@ -1,0 +1,18 @@
+- hosts: localhost
+  connection: local
+  become: yes
+  vars:
+    fogkv_path: '/home/fogkv'
+    fogkv_DAQDB_path: '/home/fogkv/daqdb-configuration-master'
+  tasks:
+   -  name: "Install nasm version 2.14."
+      shell: |
+        cd '{{ fogkv_path }}/daqdb_installation/daqdb'
+        curl -O -L http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.xz
+        tar  -xf nasm-2.14.02.tar.xz 
+        cd nasm-2.14.02/ 
+        ./configure --prefix=/usr
+        make
+        sudo make install 
+
+
