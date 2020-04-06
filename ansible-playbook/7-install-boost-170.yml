@@ -1,27 +1,43 @@
 - hosts: localhost
   connection: local
   become: yes
+  become: sudo
   vars:
     fogkv_path: '/home/fogkv'
-    fogkv_DAQDB_path: '/home/fogkv/daqdb-configuration-master'
+    fogkv_DAQDB_path: '/home/fogkv/daqdb_200406'
   tasks:
  
+
+##### Install boost version 1.69.
+ # -  name: "Download boost version 1.69"
+ #    get_url:
+ #      url: https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
+ #      dest: '{{ fogkv_path }}/daqdb_installation/daqdb/'
+ # -  name: Extract boost version 1.69"
+ #    unarchive:
+ #      src: '{{ fogkv_path }}/daqdb_installation/daqdb/boost_1_69_0.tar.gz'
+ #      dest: '{{ fogkv_path }}/daqdb_installation/daqdb/'
+ # -  name: "Install boost version 1.69."
+ #    shell: |
+ #      #yum remove -y boost-devel	
+ #      cd '{{ fogkv_path }}/daqdb_installation/daqdb/boost_1_69_0'
+ #      ./bootstrap.sh  --prefix=/usr --libdir=/usr/lib64
+ #      ./b2 --prefix=/usr --libdir=/usr/lib64 install -j70 
+ #      ls -l /usr/lib64/libboost_program_options*
 
 ##### Install boost version 1.70.
   -  name: "Download boost version 1.70"
      get_url:
        url: https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz
-       dest: '{{ fogkv_path }}/daqdb_installation/daqdb/'
+       dest: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/'
   -  name: Extract boost version 1.70"
      unarchive:
-       src: '{{ fogkv_path }}/daqdb_installation/daqdb/boost_1_70_0.tar.gz'
-       dest: '{{ fogkv_path }}/daqdb_installation/daqdb/'
+       src: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/boost_1_70_0.tar.gz'
+       dest: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/'
   -  name: "Install boost version 1.70."
      shell: |
-        #sudo yum remove -y boost-devel
-        cd '{{ fogkv_path }}/daqdb_installation/daqdb/boost_1_70_0/'
-        sudo ./bootstrap.sh  --prefix=/usr --libdir=/usr/lib64
-        sudo ./b2 --prefix=/usr --libdir=/usr/lib64 install -j70
+        cd '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/boost_1_70_0/'
+        ./bootstrap.sh  --prefix=/usr --libdir=/usr/lib64
+        ./b2 --prefix=/usr --libdir=/usr/lib64 install -j70
         ls -l /usr/lib64/libboost_program_options*
-
 

@@ -1,9 +1,9 @@
 - hosts: localhost
   connection: local
-  become: yes
+  become: sudo
   vars:
     fogkv_path: '/home/fogkv'
-    fogkv_DAQDB_path: '/home/fogkv/daqdb-configuration-master'
+    fogkv_DAQDB_path: '/home/fogkv/daqdb_200406'
   tasks:
 
 
@@ -11,21 +11,27 @@
   -  name: "Download gcc version 8.2.0"
      get_url:
        url: https://ftp.gnu.org/gnu/gcc/gcc-8.2.0/gcc-8.2.0.tar.gz
-       dest: '{{ fogkv_path }}/daqdb_installation/daqdb/'
+       dest: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/'
   -  name: Extract gcc version 8.2.0
      unarchive:
-       src: '{{ fogkv_path }}/daqdb_installation/daqdb/gcc-8.2.0.tar.gz'
-       dest: '{{ fogkv_path }}/daqdb_installation/daqdb/'
+       src: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/gcc-8.2.0.tar.gz'
+       dest: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/'
+  -  name: "Install libmpc-devel, glibc-devel.i686"
+     yum:
+       state:  present
+       name:      
+       -  libmpc-devel
+       -  glibc-devel.i686  
   -  name: Install gcc version 8.2.0.
+     become: sudo
      shell: |
-       cd '{{ fogkv_path }}/daqdb_installation/daqdb/gcc-8.2.0'
-       sudo yum -y install libmpc-devel glibc-devel.i686
+       cd '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/gcc-8.2.0'
        ./contrib/download_prerequisites 
        cd ..
        mkdir build_gcc
        cd build_gcc 
        ../gcc-8.2.0/configure --enable-bootstrap --enable-languages=c,c++,objc,obj-c++,fortran,go,lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-shared --enable-threads=posix --enable-checking=release --enable-multilib --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --with-linker-hash-style=gnu --enable-plugin --enable-initfini-array --with-isl --enable-libmpx --without-cuda-driver --enable-gnu-indirect-function --with-tune=generic --with-arch_32=x86-64 --build=x86_64-redhat-linux
-       make -j$(nproc)
-       sudo make install
+       make -j$(nproc) 
+       make install
 
 

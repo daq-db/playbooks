@@ -1,6 +1,7 @@
 - hosts: localhost
   connection: local
   become: yes
+  become: sudo
   vars:
     fogkv_path: '/home/fogkv'
     fogkv_DAQDB_path: '/home/fogkv/daqdb-configuration-master-DAQDB-installation'
@@ -14,6 +15,14 @@
      unarchive:
        src: '{{ fogkv_path }}/linux-4.15.tar.xz'
        dest: '{{ fogkv_path }}/'
+ # -  name: Download daqdb-configuration-master GITLAB
+ #    get_url:
+ #      url: https://gitlab.cern.ch/aabedabu/daqdb-configuration/-/archive/master/daqdb-configuration-master.tar.gz?path=DAQDB-installation
+ #      dest: '{{ fogkv_path }}/'
+ # -  name: Extract daqdb-configuration-master GITLAB 
+ #    unarchive:
+ #      src: '{{ fogkv_path }}/daqdb-configuration-master-DAQDB-installation.tar.gz' 
+ #      dest: '{{ fogkv_path }}/'
   -  name: Download kernel_config
      get_url:
        url: http://aabedabu.web.cern.ch/aabedabu/sites/resources/kernel_config
@@ -30,8 +39,8 @@
   -  name: Set config file
      shell: |
        cd '{{ fogkv_path }}/linux-4.15'
-       sudo make oldconfig
-       sudo make -j `nproc` && make modules_install && make install
+       make oldconfig
+       make -j `nproc` && make modules_install && make install
   -  name: Install rpm-build
      yum: 
        state:  present
@@ -51,3 +60,4 @@
 
 
  
+

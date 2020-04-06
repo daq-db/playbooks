@@ -33,3 +33,4 @@
        systemctl status openafs-client
        systemctl start openafs-client
        systemctl status openafs-client
+

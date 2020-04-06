@@ -3,18 +3,22 @@
   become: yes
   vars:
     fogkv_path: '/home/fogkv'
-    fogkv_DAQDB_path: '/home/fogkv/daqdb-configuration-master'
+    fogkv_DAQDB_path: '/home/fogkv/daqdb_200406'
   tasks:
 
 
 ##### Download code from github
-  -  name: Download code from github
+  -  name: Download DAQDB-installation code from github
+     git:
+       repo: 'https://github.com/daq-db/daqdb.git'
+       dest: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb'
+       force: yes
+       clone: yes
+       track_submodules: no
+#This is equivalent to specifying the --remote flag to git submodule update.
+  -  name: Update submodule 
      shell: |
-        cd '{{ fogkv_path }}/'
-        mkdir daqdb_installation
-        cd daqdb_installation  
-        git clone https://github.com/daq-db/daqdb.git
-        cd daqdb/
+        cd '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/'
         git submodule update --init --recursive
 
 

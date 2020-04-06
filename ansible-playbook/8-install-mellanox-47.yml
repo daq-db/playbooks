@@ -1,9 +1,9 @@
 - hosts: localhost
   connection: local
-  become: yes
+  become: sudo
   vars:
     fogkv_path: '/home/fogkv'
-    fogkv_DAQDB_path: '/home/fogkv/daqdb-configuration-master'
+    fogkv_DAQDB_path: '/home/fogkv/daqdb_200406'
   tasks:
  
 
@@ -12,17 +12,15 @@
   -  name: "Download mellanox drivers 4.7"
      get_url:
        url: http://aabedabu.web.cern.ch/aabedabu/sites/resources/MLNX_OFED_LINUX-4.7-3.2.9.0-rhel7.7-x86_64.tgz
-       dest: '{{ fogkv_path }}/daqdb_installation/daqdb/'
- # -  name: Extract mellanox drivers 4.7"
- #    unarchive:
- #      src: '{{ fogkv_path }}/MLNX_OFED_LINUX-4.7-3.2.9.0-rhel7.7-x86_64.tgz'
- #      dest: '{{ fogkv_path }}/daqdb_installation/daqdb/'
+       dest: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/'
+  -  name: Extract mellanox drivers 4.7"
+     unarchive:
+       src: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/MLNX_OFED_LINUX-4.7-3.2.9.0-rhel7.7-x86_64.tgz'
+       dest: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/'
   -  name: "Install mellanox drivers 4.7."
      shell: |
-       tar zxf MLNX_OFED_LINUX-4.7-3.2.9.0-rhel7.7-x86_64.tgz
-       cd '{{ fogkv_path }}/daqdb_installation/daqdb/MLNX_OFED_LINUX-4.7-3.2.9.0-rhel7.7-x86_64'
-       sudo ./mlnxofedinstall --add-kernel-support --dpdk
+       cd '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/MLNX_OFED_LINUX-4.7-3.2.9.0-rhel7.7-x86_64'
+       ./mlnxofedinstall --add-kernel-support --dpdk         
        /etc/init.d/openibd status
-
 
 

@@ -3,16 +3,21 @@
   become: yes
   vars:
     fogkv_path: '/home/fogkv'
-    fogkv_DAQDB_path: '/home/fogkv/daqdb-configuration-master'
+    fogkv_DAQDB_path: '/home/fogkv/daqdb_200406'
   tasks:
+   -  name: "Download nasm version 2.14"
+      get_url:
+       url: http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.xz
+       dest: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/'
+   -  name: Extract nasm version 2.14"
+      unarchive:
+       src: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/nasm-2.14.02.tar.xz'
+       dest: '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb/'
    -  name: "Install nasm version 2.14."
+      become: sudo
       shell: |
-        cd '{{ fogkv_path }}/daqdb_installation/daqdb'
-        curl -O -L http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.xz
-        tar  -xf nasm-2.14.02.tar.xz 
-        cd nasm-2.14.02/ 
+        cd '{{ fogkv_DAQDB_path }}/daqdb_installation/daqdb//nasm-2.14.02/'  
         ./configure --prefix=/usr
         make
-        sudo make install 
-
+        make install 
 
